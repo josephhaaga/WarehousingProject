@@ -1,14 +1,14 @@
 
 # coding: utf-8
 
-# In[20]:
+# In[32]:
 
 import pandas as pd;
 import http.client, urllib.request, urllib.parse, urllib.error, base64;
 import datetime;
 
 
-# In[95]:
+# In[33]:
 
 url = 'https://slickcharts.com/dowjones';
 response = urllib.request.urlopen(url).read().decode('utf-8')
@@ -29,19 +29,64 @@ for row in soup.table.tbody.find_all('tr'):
     raw_data.append(g)
 
 
-# In[97]:
+# In[34]:
 
 weights = pd.DataFrame(columns=['Rank','Company','Symbol','Weight'], data=raw_data)
 
 
-# In[99]:
+# In[35]:
 
-weights
+# weights
 
 
-# In[105]:
+# In[36]:
 
 now = datetime.datetime.now()
 nice_now = str(now.month) + "-" + str(now.day) + "--" + str(now.hour) + "-" + str(now.minute);
-weights.to_csv(nice_now+".csv")
+weights.to_csv("weights/"+nice_now+".csv")
+
+
+# In[37]:
+
+# all_the_tickers = '/'.join(weights['Symbol'])
+
+
+# In[38]:
+
+import quandl
+quandl.ApiConfig.api_key = 'k_u9AcWRLYRjV4KQhh2X';
+
+
+# In[39]:
+
+individual_tickers = {}
+for ticker in weights.Symbol:
+    individual_tickers[ticker] = quandl.get("WIKI/"+ticker)[-1:]
+
+    
+
+# individual_tickers
+
+
+# In[40]:
+
+# pd.DataFrame(individual_tickers['AAPL'].iloc[0])
+
+
+# In[41]:
+
+parsed = {};
+for k in individual_tickers.keys():
+    parsed[k] = individual_tickers[k].iloc[0]
+
+
+# In[42]:
+
+pd.DataFrame(parsed).to_csv("tickers/"+nice_now+".csv")
+
+
+# In[43]:
+
+# https://finance.yahoo.com/quote/%5EDJI/history/
+# DJIA Open & Close Price
 
